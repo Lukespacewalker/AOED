@@ -1,0 +1,45 @@
+﻿@page "/login"
+@using DoctorSystem.Client.Services
+@using DoctorSystem.Shared.Model
+@inject IAuthService AuthService
+@inject NavigationManager NavigationManager
+
+<h1>เข้าสู่ระบบ</h1>
+
+<div class="card">
+    <div class="card-body">
+        <EditForm Model="@LoginModel" OnValidSubmit="@HandleLogin">
+            <ObjectGraphDataAnnotationsValidator />
+            <InputTextEx id="Username" Header="ชื่อผู้ใช้" @bind-Value="@LoginModel.Username" />
+            <InputTextEx type="password" id="Password" Header="รหัสผ่าน" @bind-Value="@LoginModel.Password" />
+            <div class="form-group">
+                <button class="btn btn-primary" type="submit">เข้าระบบ</button>
+            </div>
+        </EditForm>
+    </div>
+</div>
+
+
+@code {
+    public LoginModel LoginModel = new LoginModel();
+
+    private bool ShowErrors;
+    private string Error = "";
+
+    private async Task HandleLogin()
+    {
+        ShowErrors = false;
+
+        var result = await AuthService.Login(LoginModel);
+
+        if (result.Successful)
+        {
+            NavigationManager.NavigateTo("/");
+        }
+        else
+        {
+            Error = result.Error;
+            ShowErrors = true;
+        }
+    }
+}

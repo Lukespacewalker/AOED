@@ -1,0 +1,54 @@
+﻿@typeparam TItem
+
+<div class="panel panel-default">
+    <div class="panel-heading">@Header <button class="btn btn-primary" type="button" @onclick="@AddItem">+ เพิ่ม</button></div>
+    <div class="panel-body listview">
+        @foreach (var item in Items)
+        {
+            <div class="listview-item">
+                <div>
+                    @ItemTemplate(item)
+                </div>
+                <button @onclick="@(()=>RemoveItem(item))" type="button" class="btn btn-danger">X ลบ</button>
+            </div>
+        }
+    </div>
+</div>
+
+<style>
+    .listview {
+    }
+
+        .listview > .listview-item:nth-child(even) {
+            background: rgba(40, 40, 40, 0.1);
+        }
+
+    .listview-item {
+        display: grid;
+        grid-template-columns: auto auto;
+        align-items: center;
+        justify-content: start;
+        padding: 1em;
+    }
+</style>
+
+@code {
+    [Parameter]
+    public string Header { get; set; }
+
+    [Parameter]
+    public RenderFragment<TItem> ItemTemplate { get; set; }
+
+    [Parameter]
+    public IList<TItem> Items { get; set; }
+
+    private void AddItem()
+    {
+        Items.Add(Activator.CreateInstance<TItem>());
+    }
+
+    private void RemoveItem(TItem item)
+    {
+        Items.Remove(item);
+    }
+}

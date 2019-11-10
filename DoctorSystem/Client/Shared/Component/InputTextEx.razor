@@ -1,0 +1,42 @@
+﻿@inherits InputBase<string>
+@implements IDisposable
+<div class="form-group">
+    <label for="@Id">@Header: </label>
+    <input @attributes="AdditionalAttributes" @bind="@CurrentValue" id="@Id" class="@CssClass form-control" />
+    <div class="validation-message">@_validationMessage</div>
+</div>
+
+@code {
+    [Parameter] public string Header { get; set; }
+    [Parameter] public string Id { get; set; }
+    private string _validationMessage;
+
+    protected override bool TryParseValueFromString(string value, out string result, out string validationErrorMessage)
+    {
+        result = value;
+        validationErrorMessage = null;
+        return true;
+    }
+
+    protected override void OnParametersSet()
+    {
+        EditContext.OnValidationStateChanged += EditContextOnOnValidationStateChanged;
+        base.OnParametersSet();
+    }
+
+    private void EditContextOnOnValidationStateChanged(object sender, ValidationStateChangedEventArgs e)
+    {
+        _validationMessage = string.Empty;
+        foreach (var message in EditContext.GetValidationMessages(FieldIdentifier))
+        {
+            _validationMessage += message;
+        }
+    }
+
+    void IDisposable.Dispose()
+    {
+        EditContext.OnValidationStateChanged -= EditContextOnOnValidationStateChanged;
+        Dispose(disposing: true);
+    }
+
+}

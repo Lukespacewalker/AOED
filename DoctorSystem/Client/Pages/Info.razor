@@ -1,0 +1,138 @@
+﻿@page "/info"
+@using DoctorSystem.Shared.Model
+
+<h1>ข้อมูลส่วนตัว</h1>
+
+<EditForm Model="@doctor" OnValidSubmit="@HandleValidSubmit">
+    <ObjectGraphDataAnnotationsValidator />
+    <div class="row">
+        <div class="col">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">ชื่อ-นามสกุล</h5>
+                    <h6 class="card-subtitle">ภาษาไทย</h6>
+                    <InputTextEx id="ThaiName" Header="ชื่อ" @bind-Value="@doctor.ThaiName" />
+                    <InputTextEx id="ThaiSurname" Header="นามสกุล" @bind-Value="@doctor.ThaiSurname" />
+                </div>
+            </div>
+        </div>
+        <div class="col">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">ชื่อ-นามสกุล</h5>
+                    <h6 class="card-subtitle">ภาษาอังกฤษ</h6>
+                    <InputTextEx id="EnglishName" Header="ชื่อ" @bind-Value="@doctor.EnglishName" />
+                    <InputTextEx id="EnglishSurname" Header="นามสกุล" @bind-Value="@doctor.EnglishSurname" />
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="card mt-4">
+        <div class="card-body">
+            <h5 class="card-title">ชื่อเล่น</h5>
+            <h6 class="card-subtitle">ภาษาอังกฤษ</h6>
+            <InputTextEx id="Nickname" Header="นามสกุล" @bind-Value="@doctor.Nickname" />
+        </div>
+    </div>
+
+
+    <div class="card mt-4">
+        <div class="card-body">
+            <h5 class="card-title">ประวัติการศึกษา</h5>
+            <InputTextEx list="institutes" id="ResidencyTraining" Header="สถาบันที่เรียน Resident" @bind-Value="@doctor.ResidencyTraining" />
+            <InputNumberEx id="ResidencyAdmissionBuddhistYear" Header="ปี พ.ศ.ที่เข้าเรียน Resident" @bind-Value="@doctor.ResidencyAdmissionBuddhistYear" />
+            <InputTextEx id="MedicalSchool" Header="สถาบันที่จบแพทยศาสตร์บัณฑิต" @bind-Value="@doctor.MedicalSchool" />
+            <InputNumberEx id="Batch" Header="รุ่นที่จบ" @bind-Value="@doctor.Batch" />
+        </div>
+    </div>
+
+
+    <div class="card mt-4">
+        <div class="card-body">
+            <h5 class="card-title">งานวิจัย</h5>
+            <InputTextEx list="topics" id="InterestedTopics" Header="หัวข้อที่สนใจ" @bind-Value="@doctor.InterestedTopics" />
+            <div class="form-group">
+                <ListView Header="งานวิจัยที่เคยตีพิมพ์" Items="@doctor.Researches" Context="research">
+                    <ItemTemplate>
+                        <label for="researchType">ชนิด: </label>
+                        <InputSelect id="researchType" @bind-Value="@research.ResearchType">
+                            <option value=@ResearchType.Thesis>วิทยานิพนธ์</option>
+                            <option value=@ResearchType.ResearchPaper>งานวิจัยอื่น ที่ได้รับการตีพิมพ์</option>
+                            <option value=@ResearchType.Other>อื่น ๆ</option>
+                        </InputSelect>
+                        <InputTextEx id="researchThaiName" Header="หัวข้อภาษาไทย" @bind-Value="@research.ThaiName" />
+                        <InputTextEx id="researchEnglishName" Header="หัวข้อภาษาอังกฤษ" @bind-Value="@research.EnglishName" />
+                        <InputTextEx id="researchJournal" Header="วารสารที่ตีพิมพ์" @bind-Value="@research.Journal" />
+                        <InputTextEx id="researchURL" Header="URL ไปยังฉบับออนไลน์" @bind-Value="@research.Url" placeholder="ex. https://psycnet.apa.org/fulltext/2015-15365-001.html" />
+                        <InputTextEx id="researchDOI" Header="DOI ของการสิ่งที่ตีพิมพ์" @bind-Value="@research.DOI" placeholder="ex. https://doi.org/10.1037/arc0000014" />
+                    </ItemTemplate>
+                </ListView>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="card mt-4">
+        <div class="card-body">
+            <h5 class="card-title">การติดต่อ</h5>
+            <InputTextEx id="CurrentWorkplace" Header="สถานที่ทำงานปัจจุบันหรือสถาบันที่กำลังศึกษา" @bind-Value="@doctor.CurrentWorkplace" />
+            <InputTextEx id="CurrentPosition" Header="ตำแหน่ง" @bind-Value="@doctor.CurrentPosition" />
+            <InputTextEx id="LineId" Header="Line Id" @bind-Value="@doctor.LineId" />
+            <ListView Header="อีเมลล์" Items="@doctor.Emails" Context="email">
+                <ItemTemplate>
+                    <InputTextEx list="contactType" id="emailType" Header="ชนิด" @bind-Value="@email.Type" />
+                    <InputTextEx id="emailAddress" Header="ที่อยู่" @bind-Value="@email.Address" placeholder="ex. example@email.com" />
+                </ItemTemplate>
+            </ListView>
+            <ListView Header="โทรศัพท์" Items="@doctor.PhoneNumbers" Context="telephone">
+                <ItemTemplate>
+                    <InputTextEx list="contactType" id="telephoneType" Header="ชนิด" @bind-Value="@telephone.Type" />
+                    <InputTextEx id="telephoneNumber" Header="หมายเลข" @bind-Value="@telephone.Number" placeholder="ex. 091-123-4567" />
+                </ItemTemplate>
+            </ListView>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <button class="btn btn-primary" type="submit">บันทึกข้อมูล</button>
+    </div>
+</EditForm>
+<datalist id="contactType">
+    <option value="ส่วนตัว" />
+    <option value="ทำงาน" />
+</datalist>
+<datalist id="institutes">
+    <option value="จุฬาลงกรณ์มหาวิทยาลัย" />
+    <option value="วิทยาลัยแพทยศาสตร์พระมงกุฎเกล้า" />
+    <option value="มหาวิทยาลัยขอนแก่น" />
+    <option value="มหาวิทยาลัยสงขลานครินทร์" />
+    <option value="โรงพยาบาลนพรัตนราชธานี" />
+    <option value="โรงพยาบาลสมเด็จ ณ ศรีราชา" />
+    <option value="โรงพยาบาลชลบุรี" />
+</datalist>
+
+<datalist id="topics">
+    <option value="Ergonomics" />
+    <option value="Work-related musculoskeletal disorders" />
+    <option value="Occupational Skin Diseases" />
+    <option value="Occupational Stress" />
+    <option value="Occupational Lung Diseases" />
+    <option value="Occupational cancers" />
+    <option value="Occupational Toxicology" />
+    <option value="Workplace Health Promotion" />
+    <option value="Return to work" />
+    <option value="Healthcare workers" />
+    <option value="Environmental Medicine" />
+    <option value="Chemical Incident Response" />
+</datalist>
+
+
+@code {
+    private Doctor doctor = new Doctor();
+
+    private void HandleValidSubmit()
+    {
+        Console.WriteLine("OnValidSubmit");
+    }
+
+}

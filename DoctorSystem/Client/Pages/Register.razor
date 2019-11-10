@@ -1,0 +1,64 @@
+﻿@page "/register"
+@using DoctorSystem.Client.Services
+@using DoctorSystem.Shared.Model.Authentication
+@inject IAuthService AuthService
+@inject NavigationManager NavigationManager
+
+<h1>ลงทะเบียนผู้ใช้ใหม่</h1>
+
+@if (ShowErrors)
+{
+    <div class="alert alert-danger" role="alert">
+        @foreach (var error in Errors)
+        {
+            <p>@error</p>
+        }
+    </div>
+}
+
+<div class="card">
+    <div class="card-body">
+        <h5 class="card-title">ข้อมูลการลงทะเบียน</h5>
+        <EditForm Model="RegisterModel" OnValidSubmit="HandleRegistration">
+            <ObjectGraphDataAnnotationsValidator />
+            <div class="form-row">
+                <div class="col">
+                    <InputTextEx id="Username" Header="ชื่อผู้ใช้" @bind-Value="@RegisterModel.Username" />
+                    <InputTextEx id="Email" Header="อีเมลล์" @bind-Value="@RegisterModel.Email" />
+                </div>
+                <div class="col">
+                    <InputTextEx id="Password" type="password" Header="รหัสผ่าน" @bind-Value="@RegisterModel.Password" />
+                    <InputTextEx id="ConfirmPassword" type="password"  Header="ยืนยันรหัสผ่าน" @bind-Value="@RegisterModel.ConfirmPassword" />
+                </div>
+            </div>
+            <div class="form-row">
+                <button type="submit" class="btn btn-primary">สมัคร</button>
+            </div>
+        </EditForm>
+    </div>
+</div>
+
+@code {
+
+    private RegisterModel RegisterModel = new RegisterModel();
+    private bool ShowErrors;
+    private IEnumerable<string> Errors;
+
+    private async Task HandleRegistration()
+    {
+        ShowErrors = false;
+
+        var result = await AuthService.Register(RegisterModel);
+
+        if (result.Successful)
+        {
+            NavigationManager.NavigateTo("/login");
+        }
+        else
+        {
+            Errors = result.Errors;
+            ShowErrors = true;
+        }
+    }
+
+}
