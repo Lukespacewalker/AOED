@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace DoctorSystem.Shared.Model
+namespace DoctorSystem.Shared.Model.Entity
 {
     public enum ResearchType : byte
     {

@@ -5,6 +5,8 @@ using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 using DoctorSystem.Shared.Model;
+using DoctorSystem.Shared.Model.Authentication;
+using DoctorSystem.Shared.Model.Identity;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
@@ -18,13 +20,19 @@ namespace DoctorSystem.Server.Controllers
     public class LoginController : ControllerBase
     {
         private readonly IConfiguration _configuration;
-        private readonly SignInManager<IdentityUser> _signInManager;
+        private readonly SignInManager<ApplicationUser> _signInManager;
+        private readonly string _jwtSecurityKey;
+        private readonly UserManager<ApplicationUser> _userManager;
 
         public LoginController(IConfiguration configuration,
-            SignInManager<IdentityUser> signInManager)
+            SignInManager<ApplicationUser> signInManager,
+            UserManager<ApplicationUser> userManager
+            )
         {
             _configuration = configuration;
             _signInManager = signInManager;
+            _userManager = userManager;
+            _jwtSecurityKey = Environment.GetEnvironmentVariable("JwtSecurityKey") ?? _configuration["JwtSecurityKey"];
         }
 
         [HttpPost]
@@ -35,12 +43,15 @@ namespace DoctorSystem.Server.Controllers
 
             if (!result.Succeeded) return BadRequest(new LoginResult { Successful = false, Error = "Username and password are invalid." });
 
+            var user = await _userManager.FindByNameAsync(login.Username).ConfigureAwait(false);
+
             var claims = new[]
             {
-                new Claim(ClaimTypes.Name, login.Username)
+                new Claim(ClaimTypes.Name, user.UserName),
+                new Claim(ClaimTypes.NameIdentifier,user.Id.ToString()),
             };
 
-            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["JwtSecurityKey"]));
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtSecurityKey));
             var credential = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
             DateTime expiry = DateTime.Now.AddDays(Convert.ToInt32(_configuration["JwtExpiryInDays"], CultureInfo.InvariantCulture));
 

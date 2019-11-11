@@ -1,23 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using DoctorSystem.Shared.Model.Identity;
 
-namespace DoctorSystem.Shared.Model
+namespace DoctorSystem.Shared.Model.Entity
 {
-    public interface IEntity<TPrimaryKey>
-    {
-        TPrimaryKey Id { get; set; }
-        byte[] RowVersion { get; set; }
-        DateTimeOffset TimeStamp { get; set; }
-    }
-
-    public abstract class Entity : IEntity<int>
-    {
-        public int Id { get; set; }
-        public byte[] RowVersion { get; set; }
-        public DateTimeOffset TimeStamp { get; set; }
-    }
-
     public class Doctor : Entity
     {
         [Required]
@@ -28,14 +15,22 @@ namespace DoctorSystem.Shared.Model
         public string EnglishName { get; set; }
         [Required]
         public string EnglishSurname { get; set; }
-        [Required]
         public string Nickname { get; set; }
+
+        [Required]
+        public int LicenseNumber { get; set; }
+#if (!SERVER)
         [ValidateComplexType]
+#endif
         public IList<Email> Emails { get; set; } = new List<Email>();
         public string LineId { get; set; }
+#if (!SERVER)
         [ValidateComplexType]
+#endif
         public IList<PhoneNumber> PhoneNumbers { get; set; } = new List<PhoneNumber>();
+#if (!SERVER)
         [ValidateComplexType]
+#endif
         public IList<Research> Researches { get; set; } = new List<Research>();
         [Required]
         public string ResidencyTraining { get; set; }

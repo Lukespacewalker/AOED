@@ -1,13 +1,13 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace DoctorSystem.Shared.Model
+namespace DoctorSystem.Shared.Model.Entity
 {
-    public class PhoneNumber : Entity
+    public class Email : Entity
     {
         [Required]
         public string Type { get; set; }
         [Required]
-        [Phone]
-        public string Number { get; set; }
+        [EmailAddress]
+        public string Address { get; set; }
     }
 }

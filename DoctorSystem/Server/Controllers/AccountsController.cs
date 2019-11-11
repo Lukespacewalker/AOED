@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using DoctorSystem.Shared.Model;
 using DoctorSystem.Shared.Model.Authentication;
+using DoctorSystem.Shared.Model.Identity;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 

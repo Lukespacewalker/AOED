@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Text;
 
@@ -27,11 +26,5 @@ namespace DoctorSystem.Shared.Model.Authentication
         [Display(Name = "Confirm password")]
         [Compare("Password", ErrorMessage = "The password and confirmation password do not match.")]
         public string ConfirmPassword { get; set; }
-    }
-
-    public class RegisterResult
-    {
-        public bool Successful { get; set; }
-        public IEnumerable<string> Errors { get; set; }
     }
 }

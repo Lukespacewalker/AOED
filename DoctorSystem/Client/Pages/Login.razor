@@ -1,8 +1,16 @@
 ﻿@page "/login"
-@using DoctorSystem.Client.Services
+@using DoctorSystem.Client.Service.Authentication
 @using DoctorSystem.Shared.Model
+@using DoctorSystem.Shared.Model.Authentication
 @inject IAuthService AuthService
 @inject NavigationManager NavigationManager
+
+@if (_showErrors)
+{
+    <div class="alert alert-danger" role="alert">
+        <p>@_error</p>
+    </div>
+}
 
 <h1>เข้าสู่ระบบ</h1>
 
@@ -23,12 +31,12 @@
 @code {
     public LoginModel LoginModel = new LoginModel();
 
-    private bool ShowErrors;
-    private string Error = "";
+    private bool _showErrors;
+    private string _error = "";
 
     private async Task HandleLogin()
     {
-        ShowErrors = false;
+        _showErrors = false;
 
         var result = await AuthService.Login(LoginModel);
 
@@ -38,8 +46,8 @@
         }
         else
         {
-            Error = result.Error;
-            ShowErrors = true;
+            _error = result.Error;
+            _showErrors = true;
         }
     }
 }

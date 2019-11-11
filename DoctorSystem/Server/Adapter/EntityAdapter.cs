@@ -4,15 +4,16 @@ using System.Linq;
 using System.Threading.Tasks;
 using DoctorSystem.Server.Database;
 using DoctorSystem.Shared.Model;
+using DoctorSystem.Shared.Model.Entity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 
 namespace DoctorSystem.Server.Adapter
 {
-    public class ParentEntityAdapter<TEntity, TPrimaryKey> where TEntity : class, IEntity<TPrimaryKey>
+    public class EntityAdapter<TEntity, TPrimaryKey> where TEntity : class, IEntity<TPrimaryKey>
     {
         private readonly ApplicationDbContext _applicationDbContext;
-        public ParentEntityAdapter(ApplicationDbContext applicationDbContext)
+        public EntityAdapter(ApplicationDbContext applicationDbContext)
         {
             _applicationDbContext = applicationDbContext;
         }
@@ -23,12 +24,12 @@ namespace DoctorSystem.Server.Adapter
             return (IEnumerable<TResult>)data;
         }
 
-        public Task<TEntity> GetById(TPrimaryKey id)
+        public virtual Task<TEntity> GetById(TPrimaryKey id)
         {
             return _applicationDbContext.Set<TEntity>().AsNoTracking().Where(c => c.Id.Equals(id)).SingleOrDefaultAsync();
         }
 
-        public async Task<(AdapterOperationResult result, TEntity entity, Exception exception)> AddOrUpdateEntity(
+        public virtual async Task<(AdapterOperationResult result, TEntity entity, Exception exception)> AddOrUpdateEntity(
             TEntity entity)
         {
             if (!_applicationDbContext.Entry(entity).IsKeySet)
@@ -64,7 +65,7 @@ namespace DoctorSystem.Server.Adapter
             // return 200 OK
             return (AdapterOperationResult.Succeed, entity, null);
         }
-        public async Task<(AdapterOperationResult result, Exception exception)> DeleteById(int id)
+        public virtual async Task<(AdapterOperationResult result, Exception exception)> DeleteById(int id)
         {
             if (await _applicationDbContext.Set<TEntity>().FindAsync(id) is TEntity entity)
                 _applicationDbContext.Set<TEntity>().Remove(entity);

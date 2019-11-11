@@ -21,27 +21,13 @@ steps:
     includePreviewVersions: true
 
 - task: DotNetCoreCLI@2
-  displayName: Restore NuGet packages
   inputs:
-    command: restore
+    command: 'publish'
+    publishWebProjects: false
     projects: '**/*Server*/*.csproj'
-    feedsToUse: 'config'
-    nugetConfigPath: 'nuget.config'
-
-- task: DotNetCoreCLI@2
-  displayName: Build
-  inputs:
-    command: build
-    projects: '**/*Server*/*.csproj'
-    arguments: --configuration $(buildConfiguration)
-
-- task: DotNetCoreCLI@2
-  displayName: Publish
-  inputs:
-    command: publish
-    publishWebProjects: True
-    zipAfterPublish: false
-    arguments: --configuration $(BuildConfiguration) --output $(build.artifactstagingdirectory)
+    zipAfterPublish: true
+    modifyOutputPath: false
+    arguments: --configuration $(BuildConfiguration) --output $(build.artifactstagingdirectory) --self-contained --runtime linux-x64
 
 - task: PublishBuildArtifacts@1
   displayName: Publish Build Artifacts

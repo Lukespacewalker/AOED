@@ -1,9 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Text;
+﻿using System.ComponentModel.DataAnnotations;
 
-namespace DoctorSystem.Shared.Model
+namespace DoctorSystem.Shared.Model.Authentication
 {
     public class LoginModel
     {
@@ -12,12 +9,5 @@ namespace DoctorSystem.Shared.Model
         [Required]
         [MinLength(6)]
         public string Password { get; set; }
-    }
-
-    public class LoginResult
-    {
-        public bool Successful { get; set; }
-        public string Error { get; set; }
-        public string Token { get; set; }
     }
 }

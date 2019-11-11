@@ -1,4 +1,6 @@
 ﻿using DoctorSystem.Shared.Model;
+using DoctorSystem.Shared.Model.Entity;
+using DoctorSystem.Shared.Model.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;

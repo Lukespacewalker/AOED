@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 using Blazored.LocalStorage;
 using Microsoft.AspNetCore.Components.Authorization;
 
-namespace DoctorSystem.Client.Services
+namespace DoctorSystem.Client.Service.Authentication
 {
     public class ApiAuthenticationStateProvider : AuthenticationStateProvider
     {
@@ -25,7 +25,7 @@ namespace DoctorSystem.Client.Services
         public override async Task<AuthenticationState> GetAuthenticationStateAsync()
         {
             var savedToken = await _localStorage.GetItemAsync<string>("authToken").ConfigureAwait(false);
-
+            // ClaimsPrincipal is a user like "Bob". An user is able to have many identities such as Id card, Driving license. Each identity has multiple claims such as a name or surname.
             if (string.IsNullOrWhiteSpace(savedToken)) return new AuthenticationState(new ClaimsPrincipal(new ClaimsIdentity()));
 
             _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", savedToken);

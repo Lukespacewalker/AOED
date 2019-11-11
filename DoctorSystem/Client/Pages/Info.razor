@@ -1,138 +1,222 @@
 ﻿@page "/info"
+@using System.Net
+@using System.Security.Claims
+@using DoctorSystem.Client.Exceptions
+@using DoctorSystem.Client.Service.Authentication
+@using DoctorSystem.Client.Service.Entity
 @using DoctorSystem.Shared.Model
+@using DoctorSystem.Shared.Model.Entity
+@inject IDoctorService DoctorService
 
-<h1>ข้อมูลส่วนตัว</h1>
+@if (_showSuccess)
+{
+    <div class="alert alert-success" role="alert">
+        <p>บันทึกข้อมูลสำเร็จ</p>
+    </div>
+}
 
-<EditForm Model="@doctor" OnValidSubmit="@HandleValidSubmit">
-    <ObjectGraphDataAnnotationsValidator />
-    <div class="row">
-        <div class="col">
-            <div class="card">
-                <div class="card-body">
-                    <h5 class="card-title">ชื่อ-นามสกุล</h5>
-                    <h6 class="card-subtitle">ภาษาไทย</h6>
-                    <InputTextEx id="ThaiName" Header="ชื่อ" @bind-Value="@doctor.ThaiName" />
-                    <InputTextEx id="ThaiSurname" Header="นามสกุล" @bind-Value="@doctor.ThaiSurname" />
+@if (_showWarning)
+{
+    <div class="alert alert-warning" role="alert">
+        <p>@_warning</p>
+    </div>
+}
+
+@if (_showError)
+{
+    <div class="alert alert-danger" role="alert">
+        <p>@_error</p>
+    </div>
+}
+
+<AuthorizeView>
+    <Authorized>
+        <h1>ข้อมูลส่วนตัว</h1>
+        <EditForm Model="@_doctor" OnValidSubmit="@HandleValidSubmit" Context="info_context">
+            <ObjectGraphDataAnnotationsValidator />
+            <div class="row">
+                <div class="col">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">ชื่อ-นามสกุล</h5>
+                            <h6 class="card-subtitle">ภาษาไทย</h6>
+                            <InputTextEx id="ThaiName" Header="ชื่อ" @bind-Value="@_doctor.ThaiName" />
+                            <InputTextEx id="ThaiSurname" Header="นามสกุล" @bind-Value="@_doctor.ThaiSurname" />
+                        </div>
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">ชื่อ-นามสกุล</h5>
+                            <h6 class="card-subtitle">ภาษาอังกฤษ</h6>
+                            <InputTextEx id="EnglishName" Header="ชื่อ" @bind-Value="@_doctor.EnglishName" />
+                            <InputTextEx id="EnglishSurname" Header="นามสกุล" @bind-Value="@_doctor.EnglishSurname" />
+                        </div>
+                    </div>
                 </div>
             </div>
-        </div>
-        <div class="col">
-            <div class="card">
+            <div class="card mt-4">
                 <div class="card-body">
-                    <h5 class="card-title">ชื่อ-นามสกุล</h5>
-                    <h6 class="card-subtitle">ภาษาอังกฤษ</h6>
-                    <InputTextEx id="EnglishName" Header="ชื่อ" @bind-Value="@doctor.EnglishName" />
-                    <InputTextEx id="EnglishSurname" Header="นามสกุล" @bind-Value="@doctor.EnglishSurname" />
+                    <InputTextEx id="Nickname" Header="ชื่อเล่น" @bind-Value="@_doctor.Nickname" />
+                    <InputNumberEx id="LicenseNumber" Header="เลขที่ใบประกอบวิชาชีพเวชกรรม" @bind-Value="@_doctor.LicenseNumber" />
                 </div>
             </div>
-        </div>
-    </div>
-    <div class="card mt-4">
-        <div class="card-body">
-            <h5 class="card-title">ชื่อเล่น</h5>
-            <h6 class="card-subtitle">ภาษาอังกฤษ</h6>
-            <InputTextEx id="Nickname" Header="นามสกุล" @bind-Value="@doctor.Nickname" />
-        </div>
-    </div>
 
 
-    <div class="card mt-4">
-        <div class="card-body">
-            <h5 class="card-title">ประวัติการศึกษา</h5>
-            <InputTextEx list="institutes" id="ResidencyTraining" Header="สถาบันที่เรียน Resident" @bind-Value="@doctor.ResidencyTraining" />
-            <InputNumberEx id="ResidencyAdmissionBuddhistYear" Header="ปี พ.ศ.ที่เข้าเรียน Resident" @bind-Value="@doctor.ResidencyAdmissionBuddhistYear" />
-            <InputTextEx id="MedicalSchool" Header="สถาบันที่จบแพทยศาสตร์บัณฑิต" @bind-Value="@doctor.MedicalSchool" />
-            <InputNumberEx id="Batch" Header="รุ่นที่จบ" @bind-Value="@doctor.Batch" />
-        </div>
-    </div>
+            <div class="card mt-4">
+                <div class="card-body">
+                    <h5 class="card-title">ประวัติการศึกษา</h5>
+                    <InputTextEx list="institutes" id="ResidencyTraining" Header="สถาบันที่เรียน Resident" @bind-Value="@_doctor.ResidencyTraining" />
+                    <InputNumberEx id="ResidencyAdmissionBuddhistYear" Header="ปี พ.ศ.ที่เข้าเรียน Resident" @bind-Value="@_doctor.ResidencyAdmissionBuddhistYear" />
+                    <InputTextEx id="MedicalSchool" Header="สถาบันที่จบแพทยศาสตร์บัณฑิต" @bind-Value="@_doctor.MedicalSchool" />
+                    <InputNumberEx id="Batch" Header="รุ่นที่จบ" @bind-Value="@_doctor.Batch" />
+                </div>
+            </div>
 
 
-    <div class="card mt-4">
-        <div class="card-body">
-            <h5 class="card-title">งานวิจัย</h5>
-            <InputTextEx list="topics" id="InterestedTopics" Header="หัวข้อที่สนใจ" @bind-Value="@doctor.InterestedTopics" />
+            <div class="card mt-4">
+                <div class="card-body">
+                    <h5 class="card-title">งานวิจัย</h5>
+                    <InputTextEx list="topics" id="InterestedTopics" Header="หัวข้อที่สนใจ" @bind-Value="@_doctor.InterestedTopics" />
+                    <div class="form-group">
+                        <ListView Header="งานวิจัยที่เคยตีพิมพ์" Items="@_doctor.Researches" Context="research">
+                            <ItemTemplate>
+                                <label for="researchType">ชนิด: </label>
+                                <InputSelect id="researchType" @bind-Value="@research.ResearchType">
+                                    <option value=@ResearchType.Thesis>วิทยานิพนธ์</option>
+                                    <option value=@ResearchType.ResearchPaper>งานวิจัยอื่น ที่ได้รับการตีพิมพ์</option>
+                                    <option value=@ResearchType.Other>อื่น ๆ</option>
+                                </InputSelect>
+                                <InputTextEx id="researchThaiName" Header="หัวข้อภาษาไทย" @bind-Value="@research.ThaiName" />
+                                <InputTextEx id="researchEnglishName" Header="หัวข้อภาษาอังกฤษ" @bind-Value="@research.EnglishName" />
+                                <InputTextEx id="researchJournal" Header="วารสารที่ตีพิมพ์" @bind-Value="@research.Journal" />
+                                <InputTextEx id="researchURL" Header="URL ไปยังฉบับออนไลน์" @bind-Value="@research.Url" placeholder="ex. https://psycnet.apa.org/fulltext/2015-15365-001.html" />
+                                <InputTextEx id="researchDOI" Header="DOI ของการสิ่งที่ตีพิมพ์" @bind-Value="@research.DOI" placeholder="ex. https://doi.org/10.1037/arc0000014" />
+                            </ItemTemplate>
+                        </ListView>
+                    </div>
+                </div>
+            </div>
+
+
+            <div class="card mt-4">
+                <div class="card-body">
+                    <h5 class="card-title">การติดต่อ</h5>
+                    <InputTextEx id="CurrentWorkplace" Header="สถานที่ทำงานปัจจุบันหรือสถาบันที่กำลังศึกษา" @bind-Value="@_doctor.CurrentWorkplace" />
+                    <InputTextEx id="CurrentPosition" Header="ตำแหน่ง" @bind-Value="@_doctor.CurrentPosition" />
+                    <InputTextEx id="LineId" Header="Line id" @bind-Value="@_doctor.LineId" />
+                    <ListView Header="อีเมลล์" Items="@_doctor.Emails" Context="email">
+                        <ItemTemplate>
+                            <InputTextEx list="contactType" id="emailType" Header="ชนิด" @bind-Value="@email.Type" />
+                            <InputTextEx id="emailAddress" Header="ที่อยู่" @bind-Value="@email.Address" placeholder="ex. example@email.com" />
+                        </ItemTemplate>
+                    </ListView>
+                    <ListView Header="โทรศัพท์" Items="@_doctor.PhoneNumbers" Context="telephone">
+                        <ItemTemplate>
+                            <InputTextEx list="contactType" id="telephoneType" Header="ชนิด" @bind-Value="@telephone.Type" />
+                            <InputTextEx id="telephoneNumber" Header="หมายเลข" @bind-Value="@telephone.Number" placeholder="ex. 091-123-4567" />
+                        </ItemTemplate>
+                    </ListView>
+                </div>
+            </div>
+
             <div class="form-group">
-                <ListView Header="งานวิจัยที่เคยตีพิมพ์" Items="@doctor.Researches" Context="research">
-                    <ItemTemplate>
-                        <label for="researchType">ชนิด: </label>
-                        <InputSelect id="researchType" @bind-Value="@research.ResearchType">
-                            <option value=@ResearchType.Thesis>วิทยานิพนธ์</option>
-                            <option value=@ResearchType.ResearchPaper>งานวิจัยอื่น ที่ได้รับการตีพิมพ์</option>
-                            <option value=@ResearchType.Other>อื่น ๆ</option>
-                        </InputSelect>
-                        <InputTextEx id="researchThaiName" Header="หัวข้อภาษาไทย" @bind-Value="@research.ThaiName" />
-                        <InputTextEx id="researchEnglishName" Header="หัวข้อภาษาอังกฤษ" @bind-Value="@research.EnglishName" />
-                        <InputTextEx id="researchJournal" Header="วารสารที่ตีพิมพ์" @bind-Value="@research.Journal" />
-                        <InputTextEx id="researchURL" Header="URL ไปยังฉบับออนไลน์" @bind-Value="@research.Url" placeholder="ex. https://psycnet.apa.org/fulltext/2015-15365-001.html" />
-                        <InputTextEx id="researchDOI" Header="DOI ของการสิ่งที่ตีพิมพ์" @bind-Value="@research.DOI" placeholder="ex. https://doi.org/10.1037/arc0000014" />
-                    </ItemTemplate>
-                </ListView>
+                <button class="btn btn-primary" type="submit">บันทึกข้อมูล</button>
             </div>
-        </div>
-    </div>
+        </EditForm>
+        <datalist id="contactType">
+            <option value="ส่วนตัว" />
+            <option value="ทำงาน" />
+        </datalist>
+        <datalist id="institutes">
+            <option value="จุฬาลงกรณ์มหาวิทยาลัย" />
+            <option value="วิทยาลัยแพทยศาสตร์พระมงกุฎเกล้า" />
+            <option value="มหาวิทยาลัยขอนแก่น" />
+            <option value="มหาวิทยาลัยสงขลานครินทร์" />
+            <option value="โรงพยาบาลนพรัตนราชธานี" />
+            <option value="โรงพยาบาลสมเด็จ ณ ศรีราชา" />
+            <option value="โรงพยาบาลชลบุรี" />
+        </datalist>
 
-
-    <div class="card mt-4">
-        <div class="card-body">
-            <h5 class="card-title">การติดต่อ</h5>
-            <InputTextEx id="CurrentWorkplace" Header="สถานที่ทำงานปัจจุบันหรือสถาบันที่กำลังศึกษา" @bind-Value="@doctor.CurrentWorkplace" />
-            <InputTextEx id="CurrentPosition" Header="ตำแหน่ง" @bind-Value="@doctor.CurrentPosition" />
-            <InputTextEx id="LineId" Header="Line Id" @bind-Value="@doctor.LineId" />
-            <ListView Header="อีเมลล์" Items="@doctor.Emails" Context="email">
-                <ItemTemplate>
-                    <InputTextEx list="contactType" id="emailType" Header="ชนิด" @bind-Value="@email.Type" />
-                    <InputTextEx id="emailAddress" Header="ที่อยู่" @bind-Value="@email.Address" placeholder="ex. example@email.com" />
-                </ItemTemplate>
-            </ListView>
-            <ListView Header="โทรศัพท์" Items="@doctor.PhoneNumbers" Context="telephone">
-                <ItemTemplate>
-                    <InputTextEx list="contactType" id="telephoneType" Header="ชนิด" @bind-Value="@telephone.Type" />
-                    <InputTextEx id="telephoneNumber" Header="หมายเลข" @bind-Value="@telephone.Number" placeholder="ex. 091-123-4567" />
-                </ItemTemplate>
-            </ListView>
-        </div>
-    </div>
-
-    <div class="form-group">
-        <button class="btn btn-primary" type="submit">บันทึกข้อมูล</button>
-    </div>
-</EditForm>
-<datalist id="contactType">
-    <option value="ส่วนตัว" />
-    <option value="ทำงาน" />
-</datalist>
-<datalist id="institutes">
-    <option value="จุฬาลงกรณ์มหาวิทยาลัย" />
-    <option value="วิทยาลัยแพทยศาสตร์พระมงกุฎเกล้า" />
-    <option value="มหาวิทยาลัยขอนแก่น" />
-    <option value="มหาวิทยาลัยสงขลานครินทร์" />
-    <option value="โรงพยาบาลนพรัตนราชธานี" />
-    <option value="โรงพยาบาลสมเด็จ ณ ศรีราชา" />
-    <option value="โรงพยาบาลชลบุรี" />
-</datalist>
-
-<datalist id="topics">
-    <option value="Ergonomics" />
-    <option value="Work-related musculoskeletal disorders" />
-    <option value="Occupational Skin Diseases" />
-    <option value="Occupational Stress" />
-    <option value="Occupational Lung Diseases" />
-    <option value="Occupational cancers" />
-    <option value="Occupational Toxicology" />
-    <option value="Workplace Health Promotion" />
-    <option value="Return to work" />
-    <option value="Healthcare workers" />
-    <option value="Environmental Medicine" />
-    <option value="Chemical Incident Response" />
-</datalist>
+        <datalist id="topics">
+            <option value="Ergonomics" />
+            <option value="Work-related musculoskeletal disorders" />
+            <option value="Occupational Skin Diseases" />
+            <option value="Occupational Stress" />
+            <option value="Occupational Lung Diseases" />
+            <option value="Occupational cancers" />
+            <option value="Occupational Toxicology" />
+            <option value="Workplace Health Promotion" />
+            <option value="Return to work" />
+            <option value="Healthcare workers" />
+            <option value="Environmental Medicine" />
+            <option value="Chemical Incident Response" />
+        </datalist>
+    </Authorized>
+    <NotAuthorized>
+        <h1>คุณไม่สามารถเข้าถึงหน้านี้ได้</h1>
+    </NotAuthorized>
+</AuthorizeView>
 
 
 @code {
-    private Doctor doctor = new Doctor();
+    [CascadingParameter]
+    private Task<AuthenticationState> AuthenticationStateTask { get; set; }
+    private Doctor _doctor = new Doctor();
 
-    private void HandleValidSubmit()
+    private bool _showError;
+    private bool _showWarning;
+    private bool _showSuccess;
+    private string _error = string.Empty;
+    private string _warning = string.Empty;
+
+    protected override async Task OnInitializedAsync()
     {
-        Console.WriteLine("OnValidSubmit");
+
+        var authState = await AuthenticationStateTask;
+        if (authState.User.Identity.IsAuthenticated)
+        {
+            string id = authState.User.Claims.First(c => c.Type == ClaimTypes.NameIdentifier).Value;
+            try
+            {
+                _doctor = await DoctorService.GetDoctor(int.Parse(id));
+            }
+            catch (ApiServerErrorException error)
+            {
+                _showError = true;
+                _error = $"เกิดข้อผิดพลาด: {error.StatusCode} {Enum.GetName(typeof(HttpStatusCode), error.StatusCode)}";
+            }
+            catch (ApiConflictedException<Doctor> error)
+            {
+                _showWarning = true;
+                _warning = $"พบว่า รุ่นของข้อมูลในฐานข้อมูล ใหม่กว่า ข้อมูลที่จะบันทึก หากยังต้องการเขียนทับด้วยข้อมูลรุ่นเก่ากว่า ให้กด บันทึกข้อมูล อีกครั้ง ";
+            }
+        }
+        base.OnInitializedAsync();
+    }
+
+    private async Task HandleValidSubmit()
+    {
+        _showError = false;
+        _showWarning = false;
+        _showSuccess = false;
+
+        try
+        {
+            var result = await DoctorService.AddOrUpdate(_doctor);
+            _showSuccess = true;
+        }
+        catch (ApiServerErrorException error)
+        {
+            _showError = true;
+            _error = $"เกิดข้อผิดพลาด: {error.StatusCode}";
+        }
+        catch (ApiConflictedException<Doctor> error)
+        {
+            _showWarning = true;
+            _warning = $"พบว่า รุ่นของข้อมูลในฐานข้อมูล ใหม่กว่า ข้อมูลที่จะบันทึก หากยังต้องการเขียนทับด้วยข้อมูลรุ่นเก่ากว่า ให้กด บันทึกข้อมูล อีกครั้ง ";
+        }
     }
 
 }

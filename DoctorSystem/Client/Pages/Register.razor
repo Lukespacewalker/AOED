@@ -1,15 +1,22 @@
 ﻿@page "/register"
-@using DoctorSystem.Client.Services
+@using DoctorSystem.Client.Service.Authentication
 @using DoctorSystem.Shared.Model.Authentication
 @inject IAuthService AuthService
 @inject NavigationManager NavigationManager
 
 <h1>ลงทะเบียนผู้ใช้ใหม่</h1>
 
-@if (ShowErrors)
+@if (_showSuccess)
+{
+    <div class="alert alert-success" role="alert">
+        <p>ลงทะเบียนผู้ใช้ @RegisterModel.Username สำเร็จ</p>
+    </div>
+}
+
+@if (_showErrors)
 {
     <div class="alert alert-danger" role="alert">
-        @foreach (var error in Errors)
+        @foreach (var error in _errors)
         {
             <p>@error</p>
         }
@@ -28,7 +35,7 @@
                 </div>
                 <div class="col">
                     <InputTextEx id="Password" type="password" Header="รหัสผ่าน" @bind-Value="@RegisterModel.Password" />
-                    <InputTextEx id="ConfirmPassword" type="password"  Header="ยืนยันรหัสผ่าน" @bind-Value="@RegisterModel.ConfirmPassword" />
+                    <InputTextEx id="ConfirmPassword" type="password" Header="ยืนยันรหัสผ่าน" @bind-Value="@RegisterModel.ConfirmPassword" />
                 </div>
             </div>
             <div class="form-row">
@@ -40,24 +47,27 @@
 
 @code {
 
-    private RegisterModel RegisterModel = new RegisterModel();
-    private bool ShowErrors;
-    private IEnumerable<string> Errors;
+    private readonly RegisterModel RegisterModel = new RegisterModel();
+    private bool _showErrors;
+    private bool _showSuccess;
+    private IEnumerable<string> _errors;
 
     private async Task HandleRegistration()
     {
-        ShowErrors = false;
+        _showErrors = false;
+        _showSuccess = false;
 
         var result = await AuthService.Register(RegisterModel);
 
         if (result.Successful)
         {
+            _showSuccess = true;
             NavigationManager.NavigateTo("/login");
         }
         else
         {
-            Errors = result.Errors;
-            ShowErrors = true;
+            _errors = result.Errors;
+            _showErrors = true;
         }
     }
 
