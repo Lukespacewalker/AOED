@@ -24,7 +24,7 @@ namespace DoctorSystem.Server.Controllers
         }
 
         [HttpGet("id/{id:int}")]
-        public async Task<IActionResult> GetByCheckUpId(TPrimaryKey id)
+        public virtual async Task<IActionResult> GetById(TPrimaryKey id)
         {
             if (await _adapter.GetById(id) is TEntity result)
                 return Ok(result.Adapt<TDto>());
@@ -34,7 +34,7 @@ namespace DoctorSystem.Server.Controllers
         [HttpPost]
         [HttpPut]
         [HttpPatch]
-        public async Task<IActionResult> InsertOrUpdateByCheckUpId([FromBody] TDto data)
+        public async Task<IActionResult> InsertOrUpdateById([FromBody] TDto data)
         {
             var (result, entity, exception) = await _adapter.AddOrUpdateEntity(InsertOrUpdateAdaptationOverride(data));
             switch (result)

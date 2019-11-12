@@ -24,9 +24,12 @@ namespace DoctorSystem.Server.Adapter
             return (IEnumerable<TResult>)data;
         }
 
-        public virtual Task<TEntity> GetById(TPrimaryKey id)
+        public virtual Task<TEntity> GetById(TPrimaryKey id, Func<IQueryable<TEntity>, IQueryable<TEntity>> queryRelatedEntities = null)
         {
-            return _applicationDbContext.Set<TEntity>().AsNoTracking().Where(c => c.Id.Equals(id)).SingleOrDefaultAsync();
+            if (queryRelatedEntities != null)
+                return queryRelatedEntities(_applicationDbContext.Set<TEntity>()).AsNoTracking().Where(c => c.Id.Equals(id)).SingleOrDefaultAsync();
+            else
+                return _applicationDbContext.Set<TEntity>().AsNoTracking().Where(c => c.Id.Equals(id)).SingleOrDefaultAsync();
         }
 
         public virtual async Task<(AdapterOperationResult result, TEntity entity, Exception exception)> AddOrUpdateEntity(
@@ -36,26 +39,27 @@ namespace DoctorSystem.Server.Adapter
                 // New Entity
                 _applicationDbContext.Set<TEntity>().Add(entity);
             // May Exiting Entity
-            else if (await _applicationDbContext.Set<TEntity>().FindAsync(entity.Id) is TEntity databaseEntity)
+            else if (await _applicationDbContext.Set<TEntity>().Where(e=>e.Id.Equals(entity.Id)).AsNoTracking().SingleOrDefaultAsync() is TEntity databaseEntity)
             {
-                // Using rowVersion from dto
-                _applicationDbContext.Entry(databaseEntity).CurrentValues.SetValues(entity);
-                _applicationDbContext.Entry(databaseEntity).OriginalValues[nameof(IEntity<TPrimaryKey>.RowVersion)] = entity.RowVersion;
+                _applicationDbContext.Set<TEntity>().Update(entity);
+                // Using rowVersion from dto because if we use rowVersion from database it will not TRIGGER ConcurrencyConflict
+                //_applicationDbContext.Entry(databaseEntity).CurrentValues.SetValues(entity);
+                //_applicationDbContext.Entry(databaseEntity).OriginalValues[nameof(IEntity<TPrimaryKey>.RowVersion)] = entity.RowVersion;
             }
             try
             {
-                await _applicationDbContext.SaveChangesAsync();
+                await _applicationDbContext.SaveChangesAsync().ConfigureAwait(false);
             }
             catch (DbUpdateConcurrencyException concurrencyException)
             {
-                foreach (var e in concurrencyException.Entries)
-                {
-                    if (e.Entity is TEntity entry)
-                    {
-                        PropertyValues dbValues = e.GetDatabaseValues();
-                        return (AdapterOperationResult.Conflict, (TEntity)dbValues.ToObject(), null);
-                    }
-                }
+                //foreach (var e in concurrencyException.Entries)
+                //{
+                //    if (e.Entity is TEntity entry)
+                //    {
+                //        PropertyValues dbValues = e.GetDatabaseValues();
+                //        return (AdapterOperationResult.Conflict, (TEntity)dbValues.ToObject(), null);
+                //    }
+                //}
                 return (AdapterOperationResult.Error, null, concurrencyException);
             }
             catch (Exception updateException)

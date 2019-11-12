@@ -1,7 +1,7 @@
 ﻿@typeparam TItem
 
 <div class="panel panel-default">
-    <div class="panel-heading">@Header <button class="btn btn-primary" type="button" @onclick="@AddItem">+ เพิ่ม</button></div>
+    <div class="panel-heading">@Header <button class="btn btn-primary ml-2" type="button" @onclick="@AddItem">+ เพิ่ม</button></div>
     <div class="panel-body listview">
         @foreach (var item in Items)
         {
@@ -25,10 +25,15 @@
 
     .listview-item {
         display: grid;
-        grid-template-columns: auto auto;
-        align-items: center;
+        grid-template-columns: 1fr auto;
+        align-items: end;
+        column-gap: 10px;
         justify-content: start;
         padding: 1em;
+    }
+
+    .listview-item button {
+        margin-bottom: 1em;
     }
 </style>
 

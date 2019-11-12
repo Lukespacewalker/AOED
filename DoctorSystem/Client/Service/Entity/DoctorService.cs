@@ -14,8 +14,8 @@ namespace DoctorSystem.Client.Service.Entity
 {
     public interface IDoctorService
     {
-        Task<Doctor> GetDoctor(int id);
-        Task<Doctor> AddOrUpdate(Doctor doctor);
+        Task<DoctorBlazor> GetDoctor(int id);
+        Task<DoctorBlazor> AddOrUpdate(DoctorBlazor doctor);
     }
     public class DoctorService : IDoctorService
     {
@@ -29,32 +29,32 @@ namespace DoctorSystem.Client.Service.Entity
             _authenticationStateProvider = authenticationStateProvider;
         }
 
-        public async Task<Doctor> GetDoctor(int id)
+        public async Task<DoctorBlazor> GetDoctor(int id)
         {
             var response = await _httpClient.GetAsync($"api/doctor/id/{id}").ConfigureAwait(false);
             if (response.IsSuccessStatusCode)
             {
-                var doctor = JsonSerializer.Deserialize<Doctor>(await response.Content.ReadAsStringAsync().ConfigureAwait(false), new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+                var doctor = JsonSerializer.Deserialize<DoctorBlazor>(await response.Content.ReadAsStringAsync().ConfigureAwait(false), new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
                 return doctor;
             }
             else
             {
-                if (response.StatusCode == HttpStatusCode.NotFound) return new Doctor();
+                if (response.StatusCode == HttpStatusCode.NotFound) return new DoctorBlazor();
                 throw new ApiServerErrorException(response.StatusCode);
             }
         }
 
-        public async Task<Doctor> AddOrUpdate(Doctor doctor)
+        public async Task<DoctorBlazor> AddOrUpdate(DoctorBlazor doctor)
         {
             var loginAsJson = JsonSerializer.Serialize(doctor);
             var response = await _httpClient.PostAsync("api/doctor", new StringContent(loginAsJson, Encoding.UTF8, "application/json")).ConfigureAwait(false);
 
             if (response.IsSuccessStatusCode || response.StatusCode == HttpStatusCode.Conflict)
             {
-                var result = JsonSerializer.Deserialize<Doctor>(await response.Content.ReadAsStringAsync().ConfigureAwait(false), new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+                var result = JsonSerializer.Deserialize<DoctorBlazor>(await response.Content.ReadAsStringAsync().ConfigureAwait(false), new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
                 if (response.IsSuccessStatusCode)
                     return result;
-                else throw new ApiConflictedException<Doctor>(result, doctor);
+                else throw new ApiConflictedException<DoctorBlazor>(result, doctor);
             }
             else
             {

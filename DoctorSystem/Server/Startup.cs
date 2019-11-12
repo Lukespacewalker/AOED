@@ -9,9 +9,13 @@ using System.Text;
 using DoctorSystem.Server.Adapter;
 using DoctorSystem.Server.Database;
 using DoctorSystem.Shared.Model;
+using DoctorSystem.Shared.Model.Entity;
 using DoctorSystem.Shared.Model.Identity;
+using Mapster;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
@@ -21,16 +25,29 @@ namespace DoctorSystem.Server
     public class Startup
     {
         public IConfiguration Configuration { get; }
+        public IWebHostEnvironment Environment { get; }
 
-        public Startup(IConfiguration configuration)
+        public Startup(IConfiguration configuration, IWebHostEnvironment environment)
         {
             Configuration = configuration;
+            Environment = environment;
         }
+
         // This method gets called by the runtime. Use this method to add services to the container.
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
         {
+            // Override Application Configuration with Environmental variables
             string connectionString = Configuration.GetConnectionString("DoctorSystemDatabase");
+            string jwtSecurityKey = Configuration["JwtSecurityKey"];
+            string invitationKey = Configuration["InvitationKey"];
+            if (Environment.IsProduction())
+            {
+                if (string.IsNullOrEmpty(jwtSecurityKey) || jwtSecurityKey == "F294D777-882C-4214-A716-20EDE4B40C56")
+                    throw new Exception("Unable to load JWTSecurityKey. Please set an environment variable JwtSecurityKey:<Secret>");
+                if (string.IsNullOrEmpty(invitationKey))
+                    throw new Exception("Unable to load InvitationKey. Please set an environment variable InvitationKey:<Secret>");
+            }
 
             services.AddDbContext<ApplicationDbContext>(options =>
                 options.UseSqlServer(connectionString));
@@ -46,8 +63,6 @@ namespace DoctorSystem.Server
                 .AddEntityFrameworkStores<ApplicationDbContext>();
 
             services.AddScoped<IEntityAdapterFactory, EntityAdapterFactory>();
-
-            string jwtSecurityKey = Configuration["JwtSecurityKey"];
 
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 .AddJwtBearer(options =>
@@ -101,6 +116,9 @@ namespace DoctorSystem.Server
                 endpoints.MapFallbackToClientSideBlazor<Client.Startup>("index.html");
             });
 
+            TypeAdapterConfig<Doctor, Doctor>
+                .NewConfig()
+                .Ignore(dest => dest.ApplicationUser);
         }
     }
 }

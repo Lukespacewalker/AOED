@@ -108,20 +108,33 @@
                     <InputTextEx id="LineId" Header="Line id" @bind-Value="@_doctor.LineId" />
                     <ListView Header="อีเมลล์" Items="@_doctor.Emails" Context="email">
                         <ItemTemplate>
-                            <InputTextEx list="contactType" id="emailType" Header="ชนิด" @bind-Value="@email.Type" />
-                            <InputTextEx id="emailAddress" Header="ที่อยู่" @bind-Value="@email.Address" placeholder="ex. example@email.com" />
+                            <div class="form-row">
+                                <div class="col">
+                                    <InputTextEx list="contactType" id="e-type" Header="ชนิด" @bind-Value="@email.Type" />
+                                </div>
+                                <div class="col">
+                                    <InputTextEx id="emailAddress" Header="ที่อยู่" @bind-Value="@email.Address" placeholder="ex. example@email.com" />
+                                </div>
+                            </div>
                         </ItemTemplate>
                     </ListView>
                     <ListView Header="โทรศัพท์" Items="@_doctor.PhoneNumbers" Context="telephone">
                         <ItemTemplate>
-                            <InputTextEx list="contactType" id="telephoneType" Header="ชนิด" @bind-Value="@telephone.Type" />
-                            <InputTextEx id="telephoneNumber" Header="หมายเลข" @bind-Value="@telephone.Number" placeholder="ex. 091-123-4567" />
+                            <div class="form-row">
+                                <div class="col">
+                                    <InputTextEx list="contactType" id="t-type" Header="ชนิด" @bind-Value="@telephone.Type" />
+                                </div>
+                                <div class="col">
+                                    <InputTextEx id="telephoneNumber" Header="หมายเลข" @bind-Value="@telephone.Number" placeholder="ex. 091-123-4567" />
+                                </div>
+                            </div>
                         </ItemTemplate>
+
                     </ListView>
                 </div>
             </div>
 
-            <div class="form-group">
+            <div class="form-group mt-3ad">
                 <button class="btn btn-primary" type="submit">บันทึกข้อมูล</button>
             </div>
         </EditForm>
@@ -163,7 +176,7 @@
 @code {
     [CascadingParameter]
     private Task<AuthenticationState> AuthenticationStateTask { get; set; }
-    private Doctor _doctor = new Doctor();
+    private DoctorBlazor _doctor = new DoctorBlazor();
 
     private bool _showError;
     private bool _showWarning;

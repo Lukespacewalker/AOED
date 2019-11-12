@@ -1,7 +1,20 @@
 ﻿@page "/"
 
-<h1>Hello, world!</h1>
+<h1>ระบบข้อมูลแพทย์อาชีวเวชศาสตร์</h1>
 
-Welcome to your new app.
-
-<SurveyPrompt Title="How is Blazor working for you?" />
+<AuthorizeView>
+    <Authorized>
+        <div class="alert alert-primary">
+            คุณได้เข้าสู่ระบบแล้ว สามารถเลือกสิ่งที่ต้องการได้จากเมนู
+        </div>
+    </Authorized>
+    <NotAuthorized>
+        <div class="alert alert-warning">
+            คุณจำเป็นต้องเข้าสู่ระบบก่อนถึงจะสามารถ ใช้งานฟีเจอร์ของระบบได้
+        </div>
+        <div class="alert alert-info">
+            <b>สิ่งสำคัญ</b> จำเป็นต้องมีรหัสคำเชิญ (Invitation Key) เพื่อใช้ในการสมัครบัญชีเพื่อเข้าสู่ระบบ
+        </div>
+        <p>สำหรับการบันทึกข้อมูลติดต่อของแพทย์อาชีวเวชศาสตร์ เพื่อใช้ในการติดต่อ และการตรวจสอบรายชื่อแพทย์สำหรับบุคลภายนอก</p>
+    </NotAuthorized>
+</AuthorizeView>

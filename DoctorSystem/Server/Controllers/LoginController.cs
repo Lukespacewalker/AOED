@@ -32,7 +32,7 @@ namespace DoctorSystem.Server.Controllers
             _configuration = configuration;
             _signInManager = signInManager;
             _userManager = userManager;
-            _jwtSecurityKey = Environment.GetEnvironmentVariable("JwtSecurityKey") ?? _configuration["JwtSecurityKey"];
+            _jwtSecurityKey = _configuration["JwtSecurityKey"];
         }
 
         [HttpPost]

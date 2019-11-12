@@ -1,21 +1,39 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html>
 
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width" />
-    <title>Doctor</title>
+    <title>ระบบข้อมูลแพทย์อาชีวเวชศาสตร์ | สมาคมโรคจากการประกอบอาชีพและสิ่งแวดล้อมแห่งประเทศไทย</title>
     <base href="/" />
     <link href="css/bootstrap/bootstrap.min.css" rel="stylesheet" />
     <link href="css/site.css" rel="stylesheet" />
 </head>
 
 <body>
-    <app>Loading...</app>
+    <app>
+        <div class="container" style="display: grid; grid-template-rows: 1fr auto 1fr;min-height: 100vh">
+            <div></div>
+            <div class="card mt-3">
+                <div class="card-body">
+                    <div class="text-center">
+                        <h1>
+                            ระบบข้อมูลแพทย์อาชีวเวชศาสตร์
+                        </h1>
+                        <div class="spinner-border my-3 text-primary" style="width: 3rem; height: 3rem;" role="status">
+                            <span class="sr-only">กำลังโหลด Blazor WebAssembly โปรดรอสักครู่...</span>
+                        </div>
+                        <h3>กำลังโหลด Blazor WebAssembly ...</h3>
+                    </div>
+                </div>
+            </div>
+            <div></div>
+        </div>
+    </app>
 
     <div id="blazor-error-ui">
-        An unhandled error has occurred.
-        <a href class="reload">Reload</a>
+        เกิดข้อผิดพลาด การโหลดหน้านี้ใหม่อาจช่วยได้
+        <a href class="reload">รีโหลด</a>
         <a class="dismiss">🗙</a>
     </div>
     <script src="_framework/blazor.webassembly.js"></script>

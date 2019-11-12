@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore;
+﻿using System;
+using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 
@@ -14,8 +15,8 @@ namespace DoctorSystem.Server
         public static IWebHost BuildWebHost(string[] args) =>
             WebHost.CreateDefaultBuilder(args)
                 .UseConfiguration(new ConfigurationBuilder()
-                    .AddCommandLine(args)
                     .AddEnvironmentVariables()
+                    .AddCommandLine(args)
                     .Build())
                 .UseStartup<Startup>()
                 .Build();

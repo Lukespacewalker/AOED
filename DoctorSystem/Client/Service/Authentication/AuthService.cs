@@ -34,15 +34,17 @@ namespace DoctorSystem.Client.Service.Authentication
 
         public async Task<RegisterResult> Register(RegisterModel registerModel)
         {
-            var result = await _httpClient.PostJsonAsync<RegisterResult>("api/accounts", registerModel).ConfigureAwait(false);
+            var registerAsJson = JsonSerializer.Serialize(registerModel);
+            var response = await _httpClient.PostAsync("api/accounts", new StringContent(registerAsJson, Encoding.UTF8, "application/json")).ConfigureAwait(false);
+            var registerResult = JsonSerializer.Deserialize<RegisterResult>(await response.Content.ReadAsStringAsync().ConfigureAwait(false), new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
 
-            return result;
+            return registerResult;
         }
 
         public async Task<LoginResult> Login(LoginModel loginModel)
         {
             var loginAsJson = JsonSerializer.Serialize(loginModel);
-            var response = await _httpClient.PostAsync("api/Login", new StringContent(loginAsJson, Encoding.UTF8, "application/json")).ConfigureAwait(false);
+            var response = await _httpClient.PostAsync("api/login", new StringContent(loginAsJson, Encoding.UTF8, "application/json")).ConfigureAwait(false);
             var loginResult = JsonSerializer.Deserialize<LoginResult>(await response.Content.ReadAsStringAsync().ConfigureAwait(false), new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
 
             if (!response.IsSuccessStatusCode)

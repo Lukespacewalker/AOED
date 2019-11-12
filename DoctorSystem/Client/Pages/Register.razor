@@ -9,7 +9,7 @@
 @if (_showSuccess)
 {
     <div class="alert alert-success" role="alert">
-        <p>ลงทะเบียนผู้ใช้ @RegisterModel.Username สำเร็จ</p>
+        <p>ลงทะเบียนผู้ใช้ @_registerModel.Username สำเร็จ</p>
     </div>
 }
 
@@ -26,17 +26,20 @@
 <div class="card">
     <div class="card-body">
         <h5 class="card-title">ข้อมูลการลงทะเบียน</h5>
-        <EditForm Model="RegisterModel" OnValidSubmit="HandleRegistration">
+        <EditForm Model="_registerModel" OnValidSubmit="HandleRegistration">
             <ObjectGraphDataAnnotationsValidator />
             <div class="form-row">
                 <div class="col">
-                    <InputTextEx id="Username" Header="ชื่อผู้ใช้" @bind-Value="@RegisterModel.Username" />
-                    <InputTextEx id="Email" Header="อีเมลล์" @bind-Value="@RegisterModel.Email" />
+                    <InputTextEx id="Username" Header="ชื่อผู้ใช้" @bind-Value="@_registerModel.Username" />
+                    <InputTextEx id="Email" Header="อีเมลล์" @bind-Value="@_registerModel.Email" />
                 </div>
                 <div class="col">
-                    <InputTextEx id="Password" type="password" Header="รหัสผ่าน" @bind-Value="@RegisterModel.Password" />
-                    <InputTextEx id="ConfirmPassword" type="password" Header="ยืนยันรหัสผ่าน" @bind-Value="@RegisterModel.ConfirmPassword" />
+                    <InputTextEx id="Password" type="password" Header="รหัสผ่าน" @bind-Value="@_registerModel.Password" />
+                    <InputTextEx id="ConfirmPassword" type="password" Header="ยืนยันรหัสผ่าน" @bind-Value="@_registerModel.ConfirmPassword" />
                 </div>
+            </div>
+            <div class="form-group">
+                <InputTextEx id="InvitationKey" Header="รหัสคำเชิญ" @bind-Value="@_registerModel.InvitationKey" />
             </div>
             <div class="form-row">
                 <button type="submit" class="btn btn-primary">สมัคร</button>
@@ -47,7 +50,7 @@
 
 @code {
 
-    private readonly RegisterModel RegisterModel = new RegisterModel();
+    private readonly RegisterModel _registerModel = new RegisterModel();
     private bool _showErrors;
     private bool _showSuccess;
     private IEnumerable<string> _errors;
@@ -57,7 +60,7 @@
         _showErrors = false;
         _showSuccess = false;
 
-        var result = await AuthService.Register(RegisterModel);
+        var result = await AuthService.Register(_registerModel);
 
         if (result.Successful)
         {
